@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카카오 로그인</title>
+</head>
+<body>
+<h1>카카오 로그인 테스트</h1>
+<button onclick="kakaoLogin()">카카오 로그인</button>
+<p id="result"></p>
+
+<script>
+    function kakaoLogin() {
+        const CLIENT_ID = "d0e33acc669d3d7994242e6879cefb32";
+        const REDIRECT_URI = "http://localhost:8080/auth/kakao/login";
+        const AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+
+        window.location.href = AUTH_URL;
+    }
+</script>
+</body>
+</html>
