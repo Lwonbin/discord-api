@@ -20,4 +20,18 @@ public class AuthController {
         User user = authService.oAuthLogin(accessCode, httpServletResponse);
         return ResponseEntity.ok(user);
     }
+
+    // Refresh Token을 이용한 Access Token 재발급
+    @GetMapping("/refresh")
+    public ResponseEntity<String> refreshAccessToken(@RequestParam("refreshToken") String refreshToken) {
+        String newAccessToken = authService.refreshAccessToken(refreshToken);
+        return ResponseEntity.ok(newAccessToken);
+    }
+
+    // 로그아웃 API (Refresh Token 삭제)
+    @GetMapping("/logout")
+    public ResponseEntity<String> logout(@RequestParam("email") String email) {
+        authService.logout(email);
+        return ResponseEntity.ok("Logged out successfully.");
+    }
 }

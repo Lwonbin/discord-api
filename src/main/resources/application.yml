@@ -4,6 +4,10 @@ spring:
       client: d0e33acc669d3d7994242e6879cefb32
       redirect: http://localhost:3000/auth/login/kakao
 
+  data:
+    redis:
+      url: redis://localhost:6379
+
 #  datasource:
 #    url: jdbc:mysql://localhost:3306/testdb
 #    username: root
