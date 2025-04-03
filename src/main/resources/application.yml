@@ -2,11 +2,16 @@ spring:
   kakao:
     auth:
       client: d0e33acc669d3d7994242e6879cefb32
-      redirect: http://localhost:3000/auth/login/kakao
+      redirect: http://localhost:8080/auth/login/kakao
 
   data:
     redis:
-      url: redis://localhost:6379
+      host: localhost
+      port: 6379
+
+
+jwt:
+  secret-key: fxZIpib8a0swUhizWyuqA2+EkGWoVcisX91kVYqlvHo=
 
 #  datasource:
 #    url: jdbc:mysql://localhost:3306/testdb

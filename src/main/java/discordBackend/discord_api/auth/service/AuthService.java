@@ -1,9 +1,18 @@
-package discordBackend.discord_api.kakao;
+package discordBackend.discord_api.auth.service;
 
+import discordBackend.discord_api.auth.converter.AuthConverter;
+import discordBackend.discord_api.auth.dto.KakaoDTO;
+import discordBackend.discord_api.auth.repository.RefreshTokenRepository;
+import discordBackend.discord_api.auth.util.JwtUtil;
+import discordBackend.discord_api.auth.util.KakaoUtil;
+import discordBackend.discord_api.user.User;
+import discordBackend.discord_api.user.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +33,7 @@ public class AuthService {
 
 
         // Access Token & Refresh Token 생성
-        String accessToken = jwtUtil.createAccessToken(user.getEmail(), user.getRole().toString());
+        String accessToken = jwtUtil.createAccessToken(user.getEmail());
         String refreshToken = jwtUtil.createRefreshToken(user.getEmail());
 
         // Refresh Token을 Redis에 저장
@@ -39,27 +48,28 @@ public class AuthService {
     }
 
     public String refreshAccessToken(String refreshToken) {
-        String email = jwtUtil.getEmailFromToken(refreshToken);
-        String storedToken = refreshTokenRepository.getRefreshToken(email);
-
-        if (storedToken != null && storedToken.equals(refreshToken)) {
-            User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-            return jwtUtil.createAccessToken(user.getEmail(), user.getRole().toString());
+        String email;
+        try {
+            email = jwtUtil.getEmailFromToken(refreshToken);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid JWT");
         }
 
-        throw new RuntimeException("Invalid Refresh Token");
+        String storedToken = refreshTokenRepository.getRefreshToken(email);
+        if (storedToken != null && storedToken.equals(refreshToken)) {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+            return jwtUtil.createAccessToken(user.getEmail());
+        }
+
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh Token Expired or Not Found");
     }
 
-    public void logout(String email) {
-        refreshTokenRepository.deleteRefreshToken(email);
-    }
 
     private User createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
         User newUser = AuthConverter.toUser(
                 kakaoProfile.getKakao_account().getEmail(),
-                kakaoProfile.getKakao_account().getProfile().getNickname(),
-                "ROLE_USER",
-                passwordEncoder
+                kakaoProfile.getKakao_account().getProfile().getNickname()
         );
         return userRepository.save(newUser);
     }

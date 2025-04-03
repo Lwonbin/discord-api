@@ -1,4 +1,4 @@
-package discordBackend.discord_api.kakao;
+package discordBackend.discord_api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

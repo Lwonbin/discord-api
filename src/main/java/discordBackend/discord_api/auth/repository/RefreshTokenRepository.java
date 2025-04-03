@@ -1,4 +1,4 @@
-package discordBackend.discord_api.kakao;
+package discordBackend.discord_api.auth.repository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -25,3 +25,4 @@ public class RefreshTokenRepository {
         redisTemplate.delete(email);
     }
 }
+

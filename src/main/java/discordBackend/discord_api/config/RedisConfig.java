@@ -1,4 +1,4 @@
-package discordBackend.discord_api.redis;
+package discordBackend.discord_api.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
@@ -14,15 +14,20 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableCaching
 public class RedisConfig {
 
-    @Value("${spring.data.redis.url}")
-    private String redisUrl;
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
+
+    @Value("${spring.data.redis.port}")
+    private int redisPort;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
-        config.setHostName(redisUrl.replace("redis://", "")); // "redis://" 제거
+        config.setHostName(redisHost);
+        config.setPort(redisPort);
         return new LettuceConnectionFactory(config);
     }
+
 
     @Bean
     public RedisTemplate<String, String> redisTemplate() {

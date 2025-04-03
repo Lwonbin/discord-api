@@ -1,8 +1,7 @@
-package discordBackend.discord_api.kakao;
+package discordBackend.discord_api.user;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Table(name = "users")
@@ -19,13 +18,11 @@ public class User {
     private String nickname;
     private String email;
     private String password;
-    private String role;
 
-    public static User createUser(String email, String nickname, String role) {
+    public static User createUser(String email, String nickname) {
         return User.builder()
                 .email(email)
                 .nickname(nickname)
-                .role(role)
                 .build();
     }
 

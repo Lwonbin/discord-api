@@ -1,8 +1,9 @@
-package discordBackend.discord_api.kakao;
+package discordBackend.discord_api.auth.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -10,16 +11,16 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "fxZIpib8a0swUhizWyuqA2+EkGWoVcisX91kVYqlvHo=";  // 보안 키
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1시간
-    private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 7일
+    @Value("${jwt.secret-key}")
+    private String SECRET_KEY;
+        private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 60; // 1분
+        private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 2분
 
-    public String createAccessToken(String email, String role) {
+    public String createAccessToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
-                .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
