@@ -16,10 +16,16 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret-key}")
+    @Value("${jwt.accessSecret}")
     private String SECRET_KEY;
-    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 60; // 1시간
-    private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 7; // 7일
+    @Value("${jwt.refreshSecret}")
+    private String REFRESH_SECRET;
+    @Value("${jwt.access_token_expired_at}")
+    private long ACCESS_TOKEN_EXPIRED_AT;
+    @Value("${jwt.refresh_token_expired_at}")
+    private long REFRESH_TOKEN_EXPIRED_AT;
+
+
 
     public String createAccessToken(Long userId, String email, String role) {
         return Jwts.builder()
@@ -27,8 +33,8 @@ public class JwtUtil {
                 .claim("email", email)
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRED_AT))
+                .signWith(accessGetSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -38,14 +44,14 @@ public class JwtUtil {
                 .claim("email", email)
                 .claim("role", role)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRED_AT))
+                .signWith(refreshGetSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public String getEmailFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(accessGetSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -54,7 +60,7 @@ public class JwtUtil {
 
     public String getRoleFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(accessGetSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -64,8 +70,12 @@ public class JwtUtil {
 
 
 
-    private Key getSigningKey() {
+    private Key accessGetSigningKey() {
         byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+    private Key refreshGetSigningKey() {
+        byte[] keyBytes = REFRESH_SECRET.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -77,7 +87,7 @@ public class JwtUtil {
 
     private Claims getAllClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(accessGetSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

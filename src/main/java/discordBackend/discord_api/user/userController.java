@@ -20,6 +20,6 @@ public class userController {
 }
 
 
-//TODO: role 추가,현재 로그인한 유저 받아오는 로직 추가
+//TODO: role 추가,현재 로그인한 유저 받아오는 로직 추가 완료
 //TODO: DB 변경, entity 변경
 
