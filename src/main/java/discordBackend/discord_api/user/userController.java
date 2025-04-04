@@ -1,5 +1,6 @@
 package discordBackend.discord_api.user;
 
+import discordBackend.discord_api.auth.util.SecurityUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,9 @@ public class userController {
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> getUserInfo() {
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+        System.out.println(currentUserId);
+
         return ResponseEntity.ok("You are logged in!");
     }
 }

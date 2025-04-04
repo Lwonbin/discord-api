@@ -33,8 +33,8 @@ public class AuthService {
 
 
         // Access Token & Refresh Token 생성
-        String accessToken = jwtUtil.createAccessToken(user.getEmail(), user.getRole());
-        String refreshToken = jwtUtil.createRefreshToken(user.getEmail(), user.getRole());
+        String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getRole());
+        String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getEmail(), user.getRole());
 
         // Refresh Token을 Redis에 저장
         refreshTokenRepository.saveRefreshToken(user.getEmail(), refreshToken);
@@ -59,7 +59,7 @@ public class AuthService {
         if (storedToken != null && storedToken.equals(refreshToken)) {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
-            return jwtUtil.createAccessToken(user.getEmail(), user.getRole());
+            return jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getRole());
         }
 
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh Token Expired or Not Found");
