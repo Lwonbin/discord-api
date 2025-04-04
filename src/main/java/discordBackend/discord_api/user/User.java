@@ -18,11 +18,13 @@ public class User {
     private String nickname;
     private String email;
     private String password;
+    private String role;
 
-    public static User createUser(String email, String nickname) {
+    public static User createUser(String email, String nickname, String role) {
         return User.builder()
                 .email(email)
                 .nickname(nickname)
+                .role(role)
                 .build();
     }
 

@@ -6,10 +6,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -29,16 +31,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = authHeader.replace("Bearer ", "");
             try {
                 String email = jwtUtil.getEmailFromToken(token);
-
+                String role = jwtUtil.getRoleFromToken(token); // role 파싱
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 email,
-                                null
+                                null,
+                                List.of(new SimpleGrantedAuthority(role)) // 권한 설정
                         );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
